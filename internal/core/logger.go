@@ -34,7 +34,7 @@ func (h *CleanHandler) Handle(_ context.Context, r slog.Record) error {
 
 	// Thread-safe write to STDERR; should be atomic for any reasonably sized log entry
 	_, err := fmt.Fprintf(h.out, "%s %s [%s] %s\n",
-		t, r.Level.String(), component, r.Message)
+		t, component, r.Level.String(), r.Message)
 	return err
 }
 
