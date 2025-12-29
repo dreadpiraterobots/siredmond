@@ -32,9 +32,22 @@ func (h *CleanHandler) Handle(_ context.Context, r slog.Record) error {
 		}
 	}
 
+	// Collect attributes into a single space-separated string: key=value
+	// This is useful when we want to log additional context in a way that is easy to parse
+	var parts []string
+	r.Attrs(func(a slog.Attr) bool {
+		parts = append(parts, fmt.Sprintf("%s=%s", a.Key, a.Value.String()))
+		return true
+	})
+
+	attrs := ""
+	if len(parts) > 0 {
+		attrs = " " + strings.Join(parts, " ")
+	}
+
 	// Thread-safe write to STDERR; should be atomic for any reasonably sized log entry
-	_, err := fmt.Fprintf(h.out, "%s %s [%s] %s\n",
-		t, component, r.Level.String(), r.Message)
+	_, err := fmt.Fprintf(h.out, "%s %s [%s] %s%s\n",
+		t, component, r.Level.String(), r.Message, attrs)
 	return err
 }
 
