@@ -5,6 +5,8 @@ A fast and efficient way to interact with Microsoft security advisory data.
 ### CVRF
 Microsoft has published a significant amount of security advisory data via the MSRC CVRF since around 2017. This is a welcome replacement for earlier MS<yy>-<nnnn> advisories.
 
+The CVRF contains a lot of useful information, although full remediation information is sometimes missing for some products (e.g. Office, Edge).
+
 ### Other data sources
 Currently, SirEdmond does not know about data sources other than the MSRC CVRF. In future, we could add support for other sources including:
 - CSAF: potentially a more fully-featured replacement for CVRF, but the MSRC implementation currently lacks historic info vs. CVRF.

@@ -1,18 +1,19 @@
 package core
 
 import (
-	"fmt"
+	"log/slog"
+	"os"
 )
 
-type Engine struct{}
-
-func NewEngine() *Engine {
-	return &Engine{}
+type Engine struct {
+	logger *slog.Logger
 }
 
-func (e *Engine) DownloadCVRF() error {
-	// We'll implement the actual http logic next,
-	// for now, let's just make sure it wires up.
-	fmt.Printf("Engine: Fetching data...\n")
-	return nil
+// The fat controller
+func NewEngine() *Engine {
+	// Set up logging as defined in logger.go
+	myHandler := &CleanHandler{out: os.Stderr}
+	return &Engine{
+		logger: slog.New(myHandler),
+	}
 }
