@@ -1,3 +1,6 @@
+// https://go.dev/blog/package-names
+// "Good package names are short and clear.
+// They are lower case, with no under_scores or mixedCaps. They are often simple nouns.
 package core
 
 import (
