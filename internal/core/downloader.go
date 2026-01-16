@@ -104,7 +104,7 @@ func (e *Engine) downloadAndCacheURL(ctx context.Context, url, cacheDir, filenam
 	// Probably, but this is straightforward and works well enough
 	_, err = file.Seek(0, io.SeekStart)
 	if err != nil {
-		file.Close() // Clean up on fai	lure
+		file.Close() // Clean up on failure
 		return nil, fmt.Errorf("failed to reset file pointer: %w", err)
 	}
 
