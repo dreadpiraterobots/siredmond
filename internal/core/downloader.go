@@ -16,7 +16,8 @@ const (
 	// HTTP client config
 	httpClientTimeout = 30 * time.Second
 	// Base URL for the CVRF API
-	cvrfBaseURL    = "https://api.msrc.microsoft.com/cvrf/v3.0/"
+	cvrfVersion    = "3.0"
+	cvrfBaseURL    = "https://api.msrc.microsoft.com/cvrf/" + cvrfVersion + "/"
 	cvrfUpdatesURL = cvrfBaseURL + "updates"
 )
 
@@ -114,7 +115,7 @@ func (e *Engine) downloadAndCacheURL(ctx context.Context, url, cacheDir, filenam
 // DownloadCVRF downloads the CVRF updates index, and then fetches individual CVRF documents
 // if the local cached copy is older/missing
 func (e *Engine) DownloadCVRF() error {
-	cacheDir, err := e.getCacheDir("cvrf")
+	cacheDir, err := e.getCacheDir("cvrf", cvrfVersion)
 	if err != nil {
 		return err
 	}
