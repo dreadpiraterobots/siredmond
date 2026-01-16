@@ -16,7 +16,7 @@ const (
 	// HTTP client config
 	httpClientTimeout = 30 * time.Second
 	// Base URL for the CVRF API
-	cvrfVersion    = "3.0"
+	cvrfVersion    = "v3.0"
 	cvrfBaseURL    = "https://api.msrc.microsoft.com/cvrf/" + cvrfVersion + "/"
 	cvrfUpdatesURL = cvrfBaseURL + "updates"
 )
