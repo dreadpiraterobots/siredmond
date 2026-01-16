@@ -1,3 +1,6 @@
+/* Define the CLI application and its commands.
+We also initialize bits of the core Engine as we need them. */
+
 package ui
 
 import (
