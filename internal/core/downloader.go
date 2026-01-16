@@ -31,9 +31,13 @@ func (e *Engine) getCacheDir(cacheType ...string) (string, error) {
 	// Build the base path: .../siredmond/cache
 	cachePath := filepath.Join(baseDir, "siredmond", "cache")
 
-	// If a cache type was provided, append it: .../siredmond/cache/cvrf
-	if len(cacheType) > 0 && cacheType[0] != "" {
-		cachePath = filepath.Join(cachePath, cacheType[0])
+	// If a cache type was provided, append it
+	// e.g. .../siredmond/cache/cvrf/3.0
+	if len(cacheType) > 0 {
+		// Go by Example: https://gobyexample.com/range-over-built-in-types
+		for _, t := range cacheType {
+			cachePath = filepath.Join(cachePath, t)
+		}
 	}
 
 	err = os.MkdirAll(cachePath, 0755)
