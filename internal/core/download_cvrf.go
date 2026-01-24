@@ -9,12 +9,12 @@ import (
 
 // DownloadCVRF downloads the CVRF updates index, and then fetches individual CVRF documents
 // if the local cached copy is older/missing
-func (e *Engine) DownloadCVRF() error {
+func (e *Engine) DownloadCVRF(ctx context.Context) error {
 	cvrfCacheDir, err := e.getCacheDir("cvrf", cvrfVersion)
 	if err != nil {
 		return err
 	}
-	cvrfIndex, err := e.DownloadCVRFIndex(cvrfCacheDir)
+	cvrfIndex, err := e.DownloadCVRFIndex(ctx, cvrfCacheDir)
 	if err != nil {
 		return err
 	}
@@ -23,9 +23,9 @@ func (e *Engine) DownloadCVRF() error {
 	return nil
 }
 
-func (e *Engine) DownloadCVRFIndex(cvrfCacheDir string) (*CVRFIndexUpdates, error) {
+func (e *Engine) DownloadCVRFIndex(ctx context.Context, cvrfCacheDir string) (*CVRFIndexUpdates, error) {
 	e.logger.Debug("Updating CVRF index", "cvrfUpdatesURL", cvrfUpdatesURL, "cacheDir", cvrfCacheDir)
-	cvrfIndexUpdatesBody, err := e.downloadAndCacheURL(context.Background(), cvrfUpdatesURL, cvrfCacheDir, "updates.json")
+	cvrfIndexUpdatesBody, err := e.downloadAndCacheURL(ctx, cvrfUpdatesURL, cvrfCacheDir, "updates.json")
 	if err != nil {
 		return nil, err
 	}
