@@ -1,5 +1,4 @@
-/* Define the CLI application and its commands.
-We also initialize bits of the core Engine as we need them. */
+/* Define the CLI application and its commands. */
 
 package ui
 
@@ -21,10 +20,6 @@ func NewCLI(engine *core.Engine) *cli.App {
 						Name:  "cvrf",
 						Usage: "Download CVRF data",
 						Action: func(c *cli.Context) error {
-							// 1. Initialize the Engine
-							engine := core.NewEngine()
-
-							// 2. Call the method in downloader.go
 							return engine.DownloadCVRF()
 						},
 					},
