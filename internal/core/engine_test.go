@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"testing"
 )
 
@@ -17,7 +18,7 @@ func TestDownloadCVRF(t *testing.T) {
 	engine := NewEngine()
 
 	// 2. Execute the stubbed method
-	err := engine.DownloadCVRF()
+	err := engine.DownloadCVRF(context.Background())
 
 	// 3. Assert the result
 	if err != nil {
