@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -15,9 +16,10 @@ const (
 	// HTTP client config
 	httpClientTimeout = 30 * time.Second
 	// Base URL for the CVRF API
-	cvrfVersion    = "v3.0"
-	cvrfBaseURL    = "https://api.msrc.microsoft.com/cvrf/" + cvrfVersion + "/"
-	cvrfUpdatesURL = cvrfBaseURL + "updates"
+	cvrfVersion             = "v3.0"
+	cvrfBaseURL             = "https://api.msrc.microsoft.com/cvrf/" + cvrfVersion + "/"
+	cvrfUpdatesURL          = cvrfBaseURL + "updates"
+	nonHTTP200BodyReadBytes = 1024
 )
 
 func (e *Engine) getCacheDir(cacheType ...string) (string, error) {
@@ -54,6 +56,9 @@ func (e *Engine) fetchURL(ctx context.Context, url string) (io.ReadCloser, error
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Accept", "application/json")
+	// Small, explicit User-Agent helps with some APIs and debugging
+	req.Header.Set("User-Agent", "siredmond/0.1 (+https://github.com/dreadpiraterobots/siredmond)")
+
 	client := &http.Client{
 		Timeout: httpClientTimeout,
 	}
@@ -67,7 +72,15 @@ func (e *Engine) fetchURL(ctx context.Context, url string) (io.ReadCloser, error
 
 	// Check for non-200 response codes
 	if resp.StatusCode != http.StatusOK {
-		resp.Body.Close()
+		// Read a small snippet of the body for debugging (bounded to avoid OOM)
+		snippetBytes, _ := io.ReadAll(io.LimitReader(resp.Body, nonHTTP200BodyReadBytes))
+		_ = resp.Body.Close()
+		snippet := strings.TrimSpace(string(snippetBytes))
+		if snippet != "" {
+			// collapse newlines for concise error messages
+			snippet = strings.ReplaceAll(snippet, "\n", " ")
+			return nil, fmt.Errorf("server returned error: %s: %s", resp.Status, snippet)
+		}
 		return nil, fmt.Errorf("server returned error: %s", resp.Status)
 	}
 
