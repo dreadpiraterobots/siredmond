@@ -16,16 +16,16 @@ type CleanHandler struct {
 
 func (h *CleanHandler) Enabled(_ context.Context, _ slog.Level) bool { return true }
 
-func (h *CleanHandler) Handle(_ context.Context, r slog.Record) error {
+func (h *CleanHandler) Handle(_ context.Context, logRecord slog.Record) error {
 	// Time in UTC
-	// The CVRF uses UTC, so we will follow suit
-	t := r.Time.UTC().Format("2006-01-02T15:04:05Z")
+	// The CVRF uses UTC (very sensible!) so we will follow suit
+	ts := logRecord.Time.UTC().Format("2006-01-02T15:04:05.000Z")
 
 	// Derive component name from filename
-	// We use r.PC (Program Counter) to find the file that called the logger
+	// logRecord.PC (Program Counter) to find the file that called the logger
 	component := "unknown"
-	if r.PC != 0 {
-		fs := runtime.CallersFrames([]uintptr{r.PC})
+	if logRecord.PC != 0 {
+		fs := runtime.CallersFrames([]uintptr{logRecord.PC})
 		f, _ := fs.Next()
 		if f.File != "" {
 			component = strings.TrimSuffix(filepath.Base(f.File), ".go")
@@ -35,7 +35,7 @@ func (h *CleanHandler) Handle(_ context.Context, r slog.Record) error {
 	// Collect attributes into a single space-separated string: key=value
 	// This is useful when we want to log additional context in a way that is easy to parse
 	var parts []string
-	r.Attrs(func(a slog.Attr) bool {
+	logRecord.Attrs(func(a slog.Attr) bool {
 		parts = append(parts, fmt.Sprintf("%s=%s", a.Key, a.Value.String()))
 		return true
 	})
@@ -47,7 +47,7 @@ func (h *CleanHandler) Handle(_ context.Context, r slog.Record) error {
 
 	// Thread-safe write to STDERR; should be atomic for any reasonably sized log entry
 	_, err := fmt.Fprintf(h.out, "%s %s [%s] %s%s\n",
-		t, component, r.Level.String(), r.Message, attrs)
+		ts, component, logRecord.Level.String(), logRecord.Message, attrs)
 	return err
 }
 
