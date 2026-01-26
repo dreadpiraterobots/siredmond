@@ -1,3 +1,5 @@
+/* Define the CLI application and its commands. */
+
 package ui
 
 import (
@@ -18,7 +20,7 @@ func NewCLI(engine *core.Engine) *cli.App {
 						Name:  "cvrf",
 						Usage: "Download CVRF data",
 						Action: func(c *cli.Context) error {
-							return engine.DownloadCVRF()
+							return engine.DownloadCVRF(c.Context)
 						},
 					},
 				},

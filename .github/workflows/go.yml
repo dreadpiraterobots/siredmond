@@ -2,7 +2,7 @@ name: Go CI
 
 on:
   push:
-    branches: [ "**" ]  # Trigger on every push to every branch
+    branches: [ "main" ]  # Trigger on every push to main
   pull_request:
     branches: [ "**" ]  # Trigger on all PRs
 

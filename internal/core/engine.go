@@ -1,18 +1,25 @@
+// https://go.dev/blog/package-names
+// "Good package names are short and clear.
+// They are lower case, with no under_scores or mixedCaps. They are often simple nouns.
 package core
 
 import (
-	"fmt"
+	"log/slog"
+	"net/http"
+	"os"
 )
 
-type Engine struct{}
-
-func NewEngine() *Engine {
-	return &Engine{}
+type Engine struct {
+	logger     *slog.Logger
+	httpClient *http.Client
 }
 
-func (e *Engine) DownloadCVRF() error {
-	// We'll implement the actual http logic next,
-	// for now, let's just make sure it wires up.
-	fmt.Printf("Engine: Fetching data...\n")
-	return nil
+// The fat controller
+func NewEngine() *Engine {
+	// Set up logging as defined in logger.go
+	myHandler := &CleanHandler{out: os.Stderr}
+	return &Engine{
+		logger:     slog.New(myHandler),
+		httpClient: &http.Client{Timeout: httpClientTimeout},
+	}
 }
