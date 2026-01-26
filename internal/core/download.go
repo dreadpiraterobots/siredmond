@@ -56,12 +56,9 @@ func (e *Engine) fetchURL(ctx context.Context, url string) (io.ReadCloser, error
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Accept", "application/json")
-	// Small, explicit User-Agent helps with some APIs and debugging
-	req.Header.Set("User-Agent", "siredmond/0.1 (+https://github.com/dreadpiraterobots/siredmond)")
 
-	client := &http.Client{
-		Timeout: httpClientTimeout,
-	}
+	// Use the Engine's HTTP client
+	client := e.httpClient
 
 	// Perform the HTTP request
 	e.logger.Debug("Requesting URL", slog.String("url", url))

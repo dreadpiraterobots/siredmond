@@ -5,11 +5,13 @@ package core
 
 import (
 	"log/slog"
+	"net/http"
 	"os"
 )
 
 type Engine struct {
-	logger *slog.Logger
+	logger     *slog.Logger
+	httpClient *http.Client
 }
 
 // The fat controller
@@ -17,6 +19,7 @@ func NewEngine() *Engine {
 	// Set up logging as defined in logger.go
 	myHandler := &CleanHandler{out: os.Stderr}
 	return &Engine{
-		logger: slog.New(myHandler),
+		logger:     slog.New(myHandler),
+		httpClient: &http.Client{Timeout: httpClientTimeout},
 	}
 }
