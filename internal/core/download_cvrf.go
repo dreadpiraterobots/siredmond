@@ -14,16 +14,15 @@ func (e *Engine) DownloadCVRF(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	cvrfIndex, err := e.DownloadCVRFIndex(ctx, cvrfCacheDir)
+	cvrfUpdates, err := e.DownloadCVRFIndex(ctx, cvrfCacheDir)
 	if err != nil {
 		return err
 	}
-	e.CVRFIndexStats(cvrfIndex)
-
+	e.CVRFIndexStats(cvrfUpdates)
 	return nil
 }
 
-func (e *Engine) DownloadCVRFIndex(ctx context.Context, cvrfCacheDir string) (*CVRFIndexUpdates, error) {
+func (e *Engine) DownloadCVRFIndex(ctx context.Context, cvrfCacheDir string) (*CVRFUpdates, error) {
 	e.logger.Debug("Updating CVRF index", "cvrfUpdatesURL", cvrfUpdatesURL, "cacheDir", cvrfCacheDir)
 	cvrfIndexUpdatesBody, err := e.downloadAndCacheURL(ctx, cvrfUpdatesURL, cvrfCacheDir, "updates.json")
 	if err != nil {
@@ -32,11 +31,14 @@ func (e *Engine) DownloadCVRFIndex(ctx context.Context, cvrfCacheDir string) (*C
 	defer cvrfIndexUpdatesBody.Close()
 
 	// Parse the JSON response of the updates index into the structs
-	var cvrfIndex CVRFIndexUpdates
+	var cvrfIndex CVRFIndex
 	if err := json.NewDecoder(cvrfIndexUpdatesBody).Decode(&cvrfIndex); err != nil {
 		return nil, fmt.Errorf("failed to decode CVRF index updates: %w", err)
 	}
-	return &cvrfIndex, nil
+	cvrfUpdates := CVRFUpdates(cvrfIndex.Value)
+	cvrfUpdates.SortByInitialReleaseDate()
+
+	return &cvrfUpdates, nil
 }
 
 // For fun, let's do some basic stats on the CVRF index info in the structs
@@ -44,11 +46,11 @@ func (e *Engine) DownloadCVRFIndex(ctx context.Context, cvrfCacheDir string) (*C
 // However, passing pointers avoids copying stuff in memory unnecessarily
 // so it's a good habit to get into because structs can get large
 // https://go.dev/tour/methods/4
-func (e *Engine) CVRFIndexStats(cvrfIndex *CVRFIndexUpdates) {
-	e.logger.Debug("CVRF index updates structs populated", "count", len(cvrfIndex.Value))
+func (e *Engine) CVRFIndexStats(cvrfUpdates *CVRFUpdates) {
+	e.logger.Debug("CVRF index updates structs populated", "count", cvrfUpdates.Len())
 	var oldestUpdate, newestUpdate time.Time
 	var oldestUpdateId, newestUpdateId string
-	for i, item := range cvrfIndex.Value {
+	for i, item := range *cvrfUpdates {
 		itemCurrentReleaseTime := item.CurrentReleaseDate
 		if i == 0 || itemCurrentReleaseTime.Before(oldestUpdate) {
 			oldestUpdate = itemCurrentReleaseTime

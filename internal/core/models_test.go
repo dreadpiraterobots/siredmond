@@ -7,7 +7,7 @@ import (
 )
 
 // TestCVRFIndexMapping ensures that the MSRC OData JSON response correctly
-// populates our CVRFIndexUpdates and CVRFIndexUpdateObject structs.
+// populates our CVRFIndex and CVRFUpdate structs.
 // This guards against breaking changes in the MSRC API or our own model definitions.
 func TestCVRFIndexMapping(t *testing.T) {
 	data := `{
@@ -22,12 +22,12 @@ func TestCVRFIndexMapping(t *testing.T) {
 		]
 	}`
 
-	var updates CVRFIndexUpdates
+	var updates CVRFIndex
 	err := json.Unmarshal([]byte(data), &updates)
 
 	// Assertions to ensure the data integrity of our models.
 	if err != nil {
-		t.Fatalf("Failed to map MSRC JSON to CVRFIndexUpdates: %v", err)
+		t.Fatalf("Failed to map MSRC JSON to CVRFIndex: %v", err)
 	}
 
 	// Verify the slice contains exactly one object cos that's what the test data has.
